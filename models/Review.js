@@ -1,11 +1,10 @@
 const mongoose = require("mongoose");
 
-const ReviewSchema = new mongoose.Schema({
-    name: String,
-    product: String,
-    rating: String,
-    comment: String,
-    timestamp: { type: Date, default: Date.now }
-});
+const reviewSchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    product: { type: String, required: true },
+    rating: { type: String, required: true },
+    comment: { type: String, required: true },
+}, { timestamps: true });
 
-module.exports = mongoose.model("Review", ReviewSchema);
+module.exports = mongoose.model("Review", reviewSchema);

@@ -3,47 +3,32 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 
+const reviewRoutes = require("./routes/reviewRoutes");
+
 const app = express();
+const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(express.json()); // Parse JSON data
-app.use(cors()); // Allow frontend to communicate with backend
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// MongoDB Connection
+// Database Connection
 mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
-    useUnifiedTopology: true,
-}).then(() => console.log("MongoDB Connected"))
-  .catch(err => console.error(err));
-
-// Review Schema
-const ReviewSchema = new mongoose.Schema({
-    name: String,
-    review: String,
-    date: { type: Date, default: Date.now }
-});
-const Review = mongoose.model("Review", ReviewSchema);
+    useUnifiedTopology: true
+})
+    .then(() => console.log("MongoDB connected"))
+    .catch(err => console.error("MongoDB connection error:", err));
 
 // Routes
-app.post("/reviews", async (req, res) => {
-    try {
-        const newReview = new Review(req.body);
-        await newReview.save();
-        res.status(201).json({ message: "Review saved successfully!" });
-    } catch (err) {
-        res.status(500).json({ error: "Error saving review" });
-    }
-});
+app.use("/api/reviews", reviewRoutes);
 
-app.get("/reviews", async (req, res) => {
-    try {
-        const reviews = await Review.find();
-        res.json(reviews);
-    } catch (err) {
-        res.status(500).json({ error: "Error fetching reviews" });
-    }
+app.get("/", (req, res) => {
+    res.send("Welcome to the Creativity Review API");
 });
 
 // Start Server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
